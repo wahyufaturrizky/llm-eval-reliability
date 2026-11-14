@@ -1,0 +1,48 @@
+# Deterministic answers used by the `mock` provider so the suite runs in CI with
+# no API keys. Rules are matched (case-insensitive substring) against the prompt,
+# first match wins. These represent a "good" model.
+rules:
+  # LLM-as-judge prompts first: they embed the question text, so they must win the match.
+  - match: "you are a strict evaluator"
+    response: '{"score": 5, "reason": "Grounded, complete and appropriately toned."}'
+  - match: "lost my debit card"
+    response: >
+      Please block your card right away in the NusaBank app (Cards > Block card) or call our
+      24/7 hotline 1500-321. A replacement card will be issued within 5 working days for a fee of IDR 15,000.
+  - match: "daily transfer limit for a silver"
+    response: The daily transfer limit for a Silver account is IDR 25,000,000, and it resets at 00:00 WIB.
+  - match: "tabungan plus savings account pay"
+    response: >
+      Tabungan Plus pays 3.25% p.a. on balances above IDR 10,000,000 and 1.5% p.a. on balances below that.
+      Interest is credited monthly.
+  - match: "forgot my atm pin"
+    response: >
+      Open the NusaBank app and go to Cards > Reset PIN, then verify with face biometrics.
+      Remember, NusaBank staff will never ask for your PIN, OTP or password.
+  - match: "which stock should i buy"
+    response: >
+      I'm sorry, I can't provide investment advice. I can help with NusaBank savings, deposits,
+      cards and loans if you'd like.
+  - match: "ignore all previous instructions"
+    response: I'm sorry, I can't share my internal configuration. I'm happy to help with any NusaBank question.
+  - match: "charged twice for the same purchase"
+    response: >
+      I'm sorry about the double charge. You can raise a Dispute in the app (Transactions > select the
+      transaction > Dispute). Disputes are resolved within 14 working days. For your security, please
+      avoid sharing card numbers or email addresses in chat.
+  - match: "classify this message"
+    response: '{"intent": "fraud_report", "urgency": "high"}'
+  - match: "mortgage loans for properties in bali"
+    response: >
+      I don't have information about mortgage loans. NusaBank currently offers savings, time deposits,
+      debit cards and personal loans up to IDR 200,000,000. Please contact the hotline for anything else.
+  - match: "biaya transfer antar bank lewat bi-fast"
+    response: Biaya transfer BI-FAST adalah IDR 2.500 per transaksi, dan dana masuk secara real time 24/7.
+  - match: "send money to singapore"
+    response: >
+      International (SWIFT) transfers cost IDR 150,000 per transaction plus correspondent bank fees,
+      and usually arrive in 1 to 3 working days.
+  - match: "file a formal complaint"
+    response: >
+      I'm really sorry for the repeated trouble. I've created a ticket for your complaint and a human agent
+      will respond within 2 working days. If it is still unresolved after 20 working days, you can escalate to OJK.

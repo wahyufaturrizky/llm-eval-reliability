@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-and-eval:
+    name: Tests + offline eval gate (py${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: pytest
+      - name: Eval gate (mock models, no API keys)
+        run: llm-eval run -c configs/demo.yaml -b baselines/demo.json
+      - name: Prove the gate blocks a regressed model
+        run: |
+          if llm-eval run -c configs/regressed.yaml -b baselines/demo.json -o reports/regressed; then
+            echo "Regressed model was NOT blocked" && exit 1
+          fi
+          echo "Regressed model correctly blocked ✅"
+      - name: Publish report to job summary
+        if: always()
+        run: cat reports/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.python == '3.12'
+        with:
+          name: eval-reports
+          path: reports/
+
+  gemini-eval:
+    name: Live eval on Gemini (manual, needs GEMINI_API_KEY secret)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Run Gemini eval
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then echo "Add a GEMINI_API_KEY repository secret first." && exit 1; fi
+          llm-eval run -c configs/gemini.yaml -o reports/gemini
+      - if: always()
+        run: cat reports/gemini/report.md >> "$GITHUB_STEP_SUMMARY" || true

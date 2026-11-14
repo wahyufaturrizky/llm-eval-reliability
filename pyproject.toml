@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-eval-reliability"
+version = "0.1.0"
+description = "Golden-dataset evaluation, regression gates and production resilience (retries, circuit breakers, model fallback) for LLM applications."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Wahyu Fatur Rizky" }]
+keywords = ["llm", "llm-evaluation", "genai", "rag", "reliability", "circuit-breaker", "gemini", "claude", "openai", "ollama", "mlops", "llmops"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = ["httpx>=0.27", "PyYAML>=6.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+otel = ["opentelemetry-api>=1.25", "opentelemetry-sdk>=1.25"]
+
+[project.scripts]
+llm-eval = "llm_eval.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/wahyufaturrizky/llm-eval-reliability"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
